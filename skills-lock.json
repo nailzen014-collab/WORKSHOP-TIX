@@ -1,0 +1,12 @@
+{
+  "version": 2,
+  "skills": {
+    "no-ai-design-slop": {
+      "source": "MengTo/Skills",
+      "sourceType": "github",
+      "skillPath": "agent-skills/ui/no-ai-design-slop/SKILL.md",
+      "computedHash": "9c83a9f3855b69dab04224cec2bfc821107d3f0d1da2f5584bdfc550807446b3",
+      "installMode": "copy"
+    }
+  }
+}

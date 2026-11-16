@@ -1,0 +1,65 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Workshop;
+use App\Models\WorkshopCategory;
+use Illuminate\Http\Request;
+use Illuminate\View\View;
+
+class WorkshopController extends Controller
+{
+    public function index(Request $request): View
+    {
+        $workshops = Workshop::query()
+            ->published()
+            ->with('category')
+            ->withCount('registrations')
+            ->when($request->filled('category'), function ($query) use ($request) {
+                $query->whereHas('category', fn ($query) => $query->where('slug', $request->string('category')->toString()));
+            })
+            ->when($request->filled('q'), function ($query) use ($request) {
+                $term = '%'.$request->string('q')->toString().'%';
+
+                $query->where(fn ($query) => $query
+                    ->where('title', 'like', $term)
+                    ->orWhere('location', 'like', $term)
+                    ->orWhere('description', 'like', $term));
+            })
+            ->orderBy('starts_at')
+            ->paginate(9)
+            ->withQueryString();
+
+        $categories = WorkshopCategory::query()
+            ->active()
+            ->orderBy('sort_order')
+            ->orderBy('name')
+            ->get();
+
+        return view('workshops.index', [
+            'workshops' => $workshops,
+            'categories' => $categories,
+        ]);
+    }
+
+    public function show(Workshop $workshop): View
+    {
+        abort_unless($workshop->status === 'published', 404);
+
+        $workshop->load('category');
+
+        $registration = null;
+
+        if ($user = request()->user()) {
+            $registration = $user->registrations()
+                ->whereBelongsTo($workshop)
+                ->with(['payment', 'ticket'])
+                ->first();
+        }
+
+        return view('workshops.show', [
+            'workshop' => $workshop,
+            'registration' => $registration,
+        ]);
+    }
+}

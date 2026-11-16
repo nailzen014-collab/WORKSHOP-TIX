@@ -1,9 +1,78 @@
-@import 'tailwindcss';
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
-@source '../../storage/framework/views/*.php';
+@layer base {
+    body {
+        @apply bg-cream-100 text-forest-900;
+    }
 
-@theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
-        'Segoe UI Symbol', 'Noto Color Emoji';
+    [x-cloak] {
+        display: none !important;
+    }
+}
+
+@layer components {
+    .display-heading {
+        @apply font-display font-extrabold uppercase leading-[0.92] tracking-tight text-forest-900;
+    }
+
+    .accent-serif {
+        @apply font-serif italic font-normal normal-case;
+    }
+
+    .eyebrow {
+        @apply text-xs font-semibold uppercase tracking-[0.2em] text-forest-600;
+    }
+
+    .pill-button {
+        @apply inline-flex items-center gap-2 rounded-full bg-forest-900 px-5 py-2.5 text-sm font-semibold text-cream-50 transition-colors hover:bg-forest-700;
+    }
+
+    .pill-button-lime {
+        @apply inline-flex items-center gap-2 rounded-full bg-lime-500 px-5 py-2.5 text-sm font-semibold text-forest-900 transition-colors hover:bg-lime-400;
+    }
+
+    .pill-button-outline {
+        @apply inline-flex items-center gap-2 rounded-full border border-forest-900/30 px-5 py-2.5 text-sm font-semibold text-forest-900 transition-colors hover:border-forest-900 hover:bg-forest-900 hover:text-cream-50;
+    }
+
+    .card-cream {
+        @apply rounded-4xl border border-forest-900/10 bg-cream-50 shadow-card;
+    }
+
+    .badge-chip {
+        @apply inline-flex items-center rounded-full border border-forest-900/20 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-forest-700;
+    }
+
+    .badge-chip-lime {
+        @apply inline-flex items-center rounded-full bg-lime-500 px-3 py-1 text-xs font-bold uppercase tracking-wide text-forest-900;
+    }
+}
+
+@layer utilities {
+    .scallop-divider {
+        background-image: radial-gradient(circle at 10px -4px, transparent 10px, theme('colors.cream.100') 11px);
+        background-size: 20px 20px;
+        background-repeat: repeat-x;
+    }
+
+    .marquee-track {
+        animation: marquee 28s linear infinite;
+    }
+
+    @keyframes marquee {
+        from {
+            transform: translateX(0);
+        }
+        to {
+            transform: translateX(-50%);
+        }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .marquee-track {
+            animation: none;
+        }
+    }
 }
