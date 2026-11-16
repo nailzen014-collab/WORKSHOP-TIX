@@ -1,0 +1,17 @@
+{
+    "agents": [
+        "cursor",
+        "codex",
+        "opencode",
+        "kiro",
+        "copilot"
+    ],
+    "cloud": true,
+    "skills": [
+        "infer-conventions",
+        "deploying-to-cloud",
+        "laravel-best-practices",
+        "testing-best-practices",
+        "tailwindcss-development"
+    ]
+}
