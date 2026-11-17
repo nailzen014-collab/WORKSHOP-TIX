@@ -52,7 +52,14 @@
       "Bash(cd /c/laragon/www/WORKSHOP-TIX && cat tests/Feature/AdminWorkshopTest.php tests/Feature/PaymentNotificationTest.php; cat database/factories/WorkshopFactory.php database/factories/PaymentFactory.php)",
       "Bash(cd /c/laragon/www/WORKSHOP-TIX && cat app/Http/Controllers/RegistrationController.php app/Http/Controllers/TicketController.php app/Policies/RegistrationPolicy.php app/View/Components/AppLayout.php; echo \"=== add_role ===\"; cat database/migrations/2026_11_16_000001_add_role_to_users_table.php; echo \"=== bootstrap/app ===\"; cat bootstrap/app.php; echo \"=== workshops/show \\(grep\\) ===\"; grep -n \"category\\\\|badge-chip\\\\|location\" resources/views/workshops/show.blade.php | head -20)",
       "Bash(cd /c/laragon/www/WORKSHOP-TIX && cat app/Http/Controllers/Auth/RegisteredUserController.php; cat database/factories/UserFactory.php; grep -rn \"payment_type\\\\|payment_status\" resources/views | head -20; cat package.json)",
-      "Bash(cd /c/laragon/www/WORKSHOP-TIX && cat resources/views/workshops/show.blade.php | head -40; echo \"=== payments/show ===\"; head -45 resources/views/payments/show.blade.php; echo \"=== git log ===\"; git log --oneline | head -5; git status --short | head)"
+      "Bash(cd /c/laragon/www/WORKSHOP-TIX && cat resources/views/workshops/show.blade.php | head -40; echo \"=== payments/show ===\"; head -45 resources/views/payments/show.blade.php; echo \"=== git log ===\"; git log --oneline | head -5; git status --short | head)",
+      "Bash(git status --short; echo ---; git log --stat -5 --format=\"%h %s \\(%ad\\)\" --date=short | head -80)",
+      "Bash(git check-ignore -v storage/app/firebase_credentials.json; git ls-files storage/app | head)",
+      "Bash(ls app/Models database/migrations database/seeders tests/Feature tests/Unit 2>&1; echo ---; wc -l app/Models/*.php app/Http/Controllers/*.php app/Http/Controllers/Admin/*.php app/Services/*.php app/Policies/*.php database/migrations/*.php | tail -1; echo ---; cat composer.json | head -40; grep -rn \"boost\" composer.json)",
+      "Bash(php -v | head -1; php -m | grep -i -E \"grpc|protobuf\"; echo \"exit=$?\"; grep -n \"google/cloud-firestore\\\\|\\\\\"google/gax\\\\\"\\\\|grpc/grpc\" -A3 composer.lock | grep -E \"\\\\\"name\\\\\"|\\\\\"version\\\\\"|ext-grpc\" | head)",
+      "Bash(git log -p --all -S \"tes_koneksi\" --format=\"== %h %s\" | grep -v \"^ \" | head -60; echo; git diff HEAD -- routes/web.php | head; git show HEAD:routes/web.php | grep -n -i -A25 \"tes_koneksi\\\\|firestore\" | head -60)",
+      "Bash(which php; ls /c/laragon/bin/php/ 2>&1; for d in /c/laragon/bin/php/*/; do echo \"$d\"; ls \"$d/ext\" | grep -i -E \"grpc|protobuf\"; grep -n -i \"grpc\" \"$d/php.ini\" 2>/dev/null; done)",
+      "Bash(php artisan tinker --execute='try { $db = app\\(Kreait\\\\Firebase\\\\Contract\\\\Firestore::class\\)->database\\(\\); foreach \\($db->collection\\(\"tes_koneksi\"\\)->limit\\(1\\)->documents\\(\\) as $d\\) { echo $d->id\\(\\), \" \", json_encode\\($d->data\\(\\)\\), PHP_EOL; } } catch \\(Throwable $e\\) { echo get_class\\($e\\), \": \", $e->getMessage\\(\\), PHP_EOL; }' 2>&1 | tail -5)"
     ]
   }
 }
