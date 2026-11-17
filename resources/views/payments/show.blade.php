@@ -57,8 +57,8 @@
 
                 @unless ($paid)
                     <p class="mt-4 rounded-2xl bg-cream-200/50 p-4 text-xs leading-relaxed text-forest-600">
-                        Setelah menyelesaikan pembayaran di halaman Midtrans, kembali ke halaman ini dan tekan "Cek Status Pembayaran".
-                        Saat dijalankan secara lokal, notifikasi otomatis dari Midtrans tidak dapat menjangkau server Anda, sehingga pengecekan manual diperlukan.
+                        Setelah pembayaran selesai, Midtrans akan mengarahkan Anda kembali ke halaman ini. Jika status belum berubah, tekan "Cek Status Pembayaran".
+                        Saat dijalankan secara lokal, notifikasi otomatis dari Midtrans tidak dapat menjangkau server Anda, sehingga pengecekan manual mungkin tetap diperlukan.
                     </p>
                 @endunless
             </div>

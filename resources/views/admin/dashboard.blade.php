@@ -48,8 +48,8 @@
                                 @foreach ($latestRegistrations as $registration)
                                     <tr>
                                         <td class="px-6 py-4">
-                                            <div class="font-semibold text-forest-900">{{ $registration->user->name }}</div>
-                                            <div class="text-xs text-forest-500">{{ $registration->user->email }}</div>
+                                            <div class="font-semibold text-forest-900">{{ $registration->user?->name ?? $registration->guest_name ?? 'Peserta guest' }}</div>
+                                            <div class="text-xs text-forest-500">{{ $registration->user?->email ?? 'Tanpa akun' }}</div>
                                         </td>
                                         <td class="px-6 py-4 text-forest-700">{{ $registration->workshop->title }}</td>
                                         <td class="px-6 py-4 font-semibold text-forest-800">

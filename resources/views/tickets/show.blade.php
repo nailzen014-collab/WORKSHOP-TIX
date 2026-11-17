@@ -22,7 +22,7 @@
                     <dl class="mt-6 space-y-3 text-sm">
                         <div class="flex justify-between gap-4 border-b border-dashed border-forest-900/15 pb-3">
                             <dt class="text-forest-500">Peserta</dt>
-                            <dd class="font-semibold text-forest-900">{{ $ticket->registration->user->name }}</dd>
+                            <dd class="font-semibold text-forest-900">{{ $ticket->registration->user?->name ?? $ticket->registration->guest_name }}</dd>
                         </div>
                         <div class="flex justify-between gap-4 border-b border-dashed border-forest-900/15 pb-3">
                             <dt class="text-forest-500">Jadwal</dt>

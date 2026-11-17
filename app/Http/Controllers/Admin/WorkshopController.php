@@ -7,6 +7,7 @@ use App\Http\Requests\Admin\WorkshopRequest;
 use App\Models\Status;
 use App\Models\Workshop;
 use App\Models\WorkshopCategory;
+use App\Services\WorkshopImageStorage;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -46,9 +47,19 @@ class WorkshopController extends Controller
         ]);
     }
 
-    public function store(WorkshopRequest $request): RedirectResponse
+    public function store(WorkshopRequest $request, WorkshopImageStorage $images): RedirectResponse
     {
-        Workshop::create($request->validated());
+        $data = $request->validated();
+        $image = $data['image'] ?? null;
+        unset($data['image']);
+
+        if ($image) {
+            $storedImage = $images->store($image);
+            $data['image_path'] = $storedImage['path'];
+            $data['image_url'] = $storedImage['url'];
+        }
+
+        Workshop::create($data);
 
         return redirect()
             ->route('admin.workshops.index')
@@ -63,18 +74,38 @@ class WorkshopController extends Controller
         ]);
     }
 
-    public function update(WorkshopRequest $request, Workshop $workshop): RedirectResponse
+    public function update(WorkshopRequest $request, Workshop $workshop, WorkshopImageStorage $images): RedirectResponse
     {
-        $workshop->update($request->validated());
+        $data = $request->validated();
+        $image = $data['image'] ?? null;
+        unset($data['image']);
+
+        if ($image) {
+            $previousImagePath = $workshop->image_path;
+            $storedImage = $images->store($image);
+            $data['image_path'] = $storedImage['path'];
+            $data['image_url'] = $storedImage['url'];
+        }
+
+        $workshop->update($data);
+
+        if ($image && $previousImagePath) {
+            $images->delete($previousImagePath);
+        }
 
         return redirect()
             ->route('admin.workshops.index')
             ->with('status', 'Workshop berhasil diperbarui.');
     }
 
-    public function destroy(Workshop $workshop): RedirectResponse
+    public function destroy(Workshop $workshop, WorkshopImageStorage $images): RedirectResponse
     {
+        $imagePath = $workshop->image_path;
         $workshop->delete();
+
+        if ($imagePath) {
+            $images->delete($imagePath);
+        }
 
         return redirect()
             ->route('admin.workshops.index')

@@ -17,6 +17,16 @@
     </div>
 
     <div>
+        <label for="image" class="{{ $label }}">{{ $workshop->image_url ? 'Ganti Gambar Workshop (opsional)' : 'Gambar Workshop (opsional)' }}</label>
+        @if ($workshop->image_url)
+            <img src="{{ $workshop->image_url }}" alt="Gambar {{ $workshop->title }}" class="mt-2 aspect-[16/9] w-full rounded-2xl object-cover">
+        @endif
+        <input id="image" name="image" type="file" accept="image/jpeg,image/png,image/webp" class="{{ $field }}">
+        <p class="mt-1 text-xs text-forest-500">Pilih gambar baru untuk mengganti gambar saat ini. Format JPG, PNG, atau WebP, maksimal 5 MB. Gambar disimpan di penyimpanan lokal.</p>
+        @error('image') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
+    </div>
+
+    <div>
         <label for="category_id" class="{{ $label }}">Kategori</label>
         <select id="category_id" name="category_id" class="{{ $field }}">
             <option value="">Tanpa kategori</option>

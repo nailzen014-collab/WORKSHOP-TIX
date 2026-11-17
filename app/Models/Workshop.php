@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-#[Fillable(['title', 'category_id', 'slug', 'description', 'price', 'starts_at', 'ends_at', 'location', 'status'])]
+#[Fillable(['title', 'category_id', 'slug', 'description', 'price', 'starts_at', 'ends_at', 'location', 'status', 'image_path', 'image_url'])]
 class Workshop extends Model
 {
     /** @use HasFactory<WorkshopFactory> */

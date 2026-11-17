@@ -76,3 +76,25 @@ test('admin can view the participants list', function () {
 
     $this->actingAs($admin)->get(route('admin.participants.index'))->assertOk();
 });
+
+test('admin can see and search guest registrations', function () {
+    $admin = User::factory()->admin()->create();
+    $workshop = Workshop::factory()->create();
+    $workshop->registrations()->create([
+        'user_id' => null,
+        'guest_name' => 'Nabhan Guest',
+        'status' => 'pending',
+    ]);
+
+    $this->actingAs($admin)
+        ->get(route('admin.dashboard'))
+        ->assertOk()
+        ->assertSee('Nabhan Guest')
+        ->assertSee('Tanpa akun');
+
+    $this->actingAs($admin)
+        ->get(route('admin.participants.index', ['q' => 'Nabhan Guest']))
+        ->assertOk()
+        ->assertSee('Nabhan Guest')
+        ->assertSee('Tanpa akun');
+});

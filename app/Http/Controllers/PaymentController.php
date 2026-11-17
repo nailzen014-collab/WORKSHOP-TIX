@@ -10,6 +10,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
 use Midtrans\Config;
@@ -18,9 +19,7 @@ use Midtrans\Transaction;
 
 class PaymentController extends Controller
 {
-    public function __construct(private PaymentTypeResolver $paymentTypes)
-    {
-    }
+    public function __construct(private PaymentTypeResolver $paymentTypes) {}
 
     public function show(Registration $registration): View
     {
@@ -37,12 +36,55 @@ class PaymentController extends Controller
     {
         Gate::authorize('view', $registration);
 
+        return $this->startPayment($registration, route('payments.show', $registration));
+    }
+
+    public function check(Registration $registration): RedirectResponse
+    {
+        Gate::authorize('view', $registration);
+
+        return $this->checkPayment($registration, route('payments.show', $registration));
+    }
+
+    public function showGuest(Registration $registration): View
+    {
+        abort_unless($registration->user_id === null, 404);
+
+        $registration->load('payment', 'workshop', 'ticket');
+
+        return view('payments.guest', [
+            'registration' => $registration,
+            'payUrl' => $this->guestPaymentUrl('guest.payments.pay', $registration),
+            'checkUrl' => $this->guestPaymentUrl('guest.payments.check', $registration),
+        ]);
+    }
+
+    public function payGuest(Registration $registration): RedirectResponse
+    {
+        abort_unless($registration->user_id === null, 404);
+
+        return $this->startPayment(
+            $registration,
+            $this->guestPaymentUrl('guest.payments.show', $registration),
+        );
+    }
+
+    public function checkGuest(Registration $registration): RedirectResponse
+    {
+        abort_unless($registration->user_id === null, 404);
+
+        return $this->checkPayment(
+            $registration,
+            $this->guestPaymentUrl('guest.payments.show', $registration),
+        );
+    }
+
+    private function startPayment(Registration $registration, string $finishUrl): RedirectResponse
+    {
         $payment = $registration->payment;
 
         if ($payment->isPaid()) {
-            return redirect()
-                ->route('payments.show', $registration)
-                ->with('status', 'Pembayaran sudah lunas.');
+            return redirect()->to($finishUrl)->with('status', 'Pembayaran sudah lunas.');
         }
 
         if ($payment->snap_token) {
@@ -51,36 +93,32 @@ class PaymentController extends Controller
 
         try {
             $this->configureMidtrans();
-
             $transaction = Snap::createTransaction([
                 'transaction_details' => [
                     'order_id' => $payment->order_id,
                     'gross_amount' => $payment->amount,
                 ],
+                'callbacks' => [
+                    'finish' => $finishUrl,
+                ],
             ]);
         } catch (\Exception $e) {
             report($e);
 
-            return back()->with('error', 'Gagal membuat transaksi pembayaran. Silakan coba lagi.');
+            return redirect()->to($finishUrl)->with('error', 'Gagal membuat transaksi pembayaran. Silakan coba lagi.');
         }
 
-        $payment->update([
-            'snap_token' => $transaction->token,
-        ]);
+        $payment->update(['snap_token' => $transaction->token]);
 
         return redirect()->away($this->snapRedirectUrl($payment));
     }
 
-    public function check(Registration $registration): RedirectResponse
+    private function checkPayment(Registration $registration, string $returnUrl): RedirectResponse
     {
-        Gate::authorize('view', $registration);
-
         $payment = $registration->payment;
 
         if ($payment->isPaid()) {
-            return redirect()
-                ->route('payments.show', $registration)
-                ->with('status', 'Pembayaran sudah lunas.');
+            return redirect()->to($returnUrl)->with('status', 'Pembayaran sudah lunas.');
         }
 
         try {
@@ -89,24 +127,20 @@ class PaymentController extends Controller
         } catch (\Exception $e) {
             report($e);
 
-            return redirect()
-                ->route('payments.show', $registration)
-                ->with('error', 'Gagal memeriksa status pembayaran.');
+            return redirect()->to($returnUrl)->with('error', 'Gagal memeriksa status pembayaran.');
         }
 
         $sameOrder = $result->order_id === $payment->order_id;
         $sameAmount = (int) round((float) $result->gross_amount) === (int) $payment->amount;
 
         if (! $sameOrder || ! $sameAmount) {
-            return redirect()
-                ->route('payments.show', $registration)
-                ->with('error', 'Data transaksi tidak sesuai. Silakan hubungi panitia.');
+            return redirect()->to($returnUrl)->with('error', 'Data transaksi tidak sesuai. Silakan hubungi panitia.');
         }
 
         $this->applyTransactionStatus($payment, $result->transaction_status ?? 'unknown');
 
         return redirect()
-            ->route('payments.show', $registration)
+            ->to($returnUrl)
             ->with('status', $payment->fresh()->isPaid() ? 'Pembayaran berhasil.' : 'Pembayaran belum berhasil.');
     }
 
@@ -181,6 +215,11 @@ class PaymentController extends Controller
             : 'https://app.sandbox.midtrans.com';
 
         return $base.'/snap/v2/vtweb/'.$payment->snap_token;
+    }
+
+    private function guestPaymentUrl(string $route, Registration $registration): string
+    {
+        return URL::temporarySignedRoute($route, now()->addDays(7), ['registration' => $registration]);
     }
 
     private function configureMidtrans(): void

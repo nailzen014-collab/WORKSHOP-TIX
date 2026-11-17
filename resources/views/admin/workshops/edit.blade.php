@@ -9,7 +9,7 @@
                 <p class="eyebrow">Panel Panitia</p>
                 <h1 class="mt-1 font-display text-2xl font-extrabold uppercase tracking-tight text-forest-900">Edit Workshop</h1>
 
-                <form method="POST" action="{{ route('admin.workshops.update', $workshop) }}" class="mt-6 space-y-6">
+                <form method="POST" action="{{ route('admin.workshops.update', $workshop) }}" enctype="multipart/form-data" class="mt-6 space-y-6">
                     @csrf
                     @method('PUT')
                     @include('admin.workshops.partials.form', ['workshop' => $workshop])

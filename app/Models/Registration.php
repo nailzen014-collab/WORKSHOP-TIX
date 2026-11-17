@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
-#[Fillable(['user_id', 'workshop_id', 'status'])]
+#[Fillable(['user_id', 'workshop_id', 'guest_name', 'status'])]
 class Registration extends Model
 {
     use HasFactory;

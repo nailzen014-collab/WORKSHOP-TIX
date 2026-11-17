@@ -64,7 +64,7 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
             <div class="flex flex-wrap items-end justify-between gap-4 border-b border-forest-900/10 pb-6">
                 <div>
-                    <p class="eyebrow">Jadwal Terdekat</p>
+                    <p class="eyebrow">Pilihan Kegiatan</p>
                     <h2 class="display-heading mt-2 text-4xl sm:text-5xl">
                         Pilih <span class="accent-serif text-forest-700">Workshop-nya.</span>
                     </h2>
@@ -87,40 +87,45 @@
             @else
                 <div class="mt-10 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
                     @foreach ($workshops as $workshop)
-                        <article class="card-cream group flex flex-col p-6 transition-transform hover:-translate-y-1">
-                            <div class="flex flex-wrap items-center justify-between gap-2">
-                                <div class="flex flex-wrap items-center gap-2">
-                                    @if ($workshop->category)
-                                        <span class="badge-chip-lime">{{ $workshop->category->name }}</span>
-                                    @endif
-                                    <span class="badge-chip">{{ $workshop->location }}</span>
-                                </div>
-                                <span class="text-xs font-semibold text-forest-500">{{ $workshop->registrations_count }} peserta</span>
-                            </div>
-
-                            <h3 class="mt-4 font-display text-xl font-extrabold uppercase leading-tight tracking-tight text-forest-900">
-                                <a href="{{ route('workshops.show', $workshop) }}">{{ $workshop->title }}</a>
-                            </h3>
-
-                            <p class="mt-2 flex-1 text-sm text-forest-700">
-                                {{ \Illuminate\Support\Str::limit($workshop->description, 110) }}
-                            </p>
-
-                            <div class="mt-5 flex items-center justify-between gap-4 border-t border-forest-900/10 pt-4">
-                                <div>
-                                    <p class="eyebrow">Jadwal</p>
-                                    <p class="mt-0.5 text-sm font-semibold text-forest-800">{{ $workshop->starts_at->translatedFormat('d M Y, H:i') }}</p>
-                                </div>
-                                <div class="text-right">
-                                    <p class="eyebrow">Harga</p>
-                                    <p class="mt-0.5 font-display text-lg font-extrabold text-forest-900">Rp{{ number_format($workshop->price, 0, ',', '.') }}</p>
-                                </div>
-                            </div>
-
-                            <a href="{{ route('workshops.show', $workshop) }}" class="pill-button mt-4 justify-center">
-                                Lihat Detail
-                                <svg class="h-4 w-4 transition-transform group-hover:translate-x-1" viewBox="0 0 20 20" fill="currentColor"><path d="M6 4l6 6-6 6V4z" /></svg>
+                        <article class="card-cream group flex flex-col overflow-hidden transition-transform hover:-translate-y-1">
+                            <a href="{{ route('workshops.show', $workshop) }}" class="block aspect-[16/10] overflow-hidden bg-cream-200">
+                                <img
+                                    src="{{ $workshop->image_url ?: asset('images/hero-workshop.png') }}"
+                                    alt="{{ $workshop->title }}"
+                                    class="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
+                                    loading="lazy"
+                                    decoding="async"
+                                />
                             </a>
+
+                            <div class="flex flex-1 flex-col p-6">
+                                <h3 class="font-display text-xl font-extrabold uppercase leading-tight tracking-tight text-forest-900">
+                                    <a href="{{ route('workshops.show', $workshop) }}">{{ $workshop->title }}</a>
+                                </h3>
+
+                                <p class="mt-2 flex-1 text-sm text-forest-700">
+                                    {{ \Illuminate\Support\Str::limit($workshop->description, 110) }}
+                                </p>
+
+                                <div class="mt-5 flex flex-wrap items-end justify-between gap-3 border-t border-forest-900/10 pt-4">
+                                    <div class="flex flex-wrap items-center gap-2">
+                                        @if ($workshop->category)
+                                            <span class="badge-chip-lime">{{ $workshop->category->name }}</span>
+                                        @endif
+                                        <span class="badge-chip">{{ $workshop->location }}</span>
+                                    </div>
+                                    <div class="ml-auto text-right">
+                                        <p class="text-xs font-semibold text-forest-500">{{ $workshop->registrations_count }} peserta</p>
+                                        <p class="eyebrow">Harga</p>
+                                        <p class="mt-0.5 font-display text-lg font-extrabold text-forest-900">Rp{{ number_format($workshop->price, 0, ',', '.') }}</p>
+                                    </div>
+                                </div>
+
+                                <a href="{{ route('workshops.show', $workshop) }}" class="pill-button mt-4 justify-center">
+                                    Lihat Detail
+                                    <svg class="h-4 w-4 transition-transform group-hover:translate-x-1" viewBox="0 0 20 20" fill="currentColor"><path d="M6 4l6 6-6 6V4z" /></svg>
+                                </a>
+                            </div>
                         </article>
                     @endforeach
                 </div>
@@ -141,7 +146,7 @@
             <div class="mt-10 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
                 @foreach ([
                     ['no' => '01', 'title' => 'Pilih Workshop', 'desc' => 'Telusuri daftar workshop IT dan buka detailnya.'],
-                    ['no' => '02', 'title' => 'Daftar Akun', 'desc' => 'Buat akun peserta atau masuk jika sudah punya.'],
+                    ['no' => '02', 'title' => 'Pilih Cara Daftar', 'desc' => 'Masuk, buat akun, atau lanjut sebagai guest.'],
                     ['no' => '03', 'title' => 'Bayar', 'desc' => 'Selesaikan pembayaran lewat Midtrans Sandbox.'],
                     ['no' => '04', 'title' => 'Dapatkan Tiket', 'desc' => 'Tiket digital terbit otomatis setelah lunas.'],
                 ] as $step)

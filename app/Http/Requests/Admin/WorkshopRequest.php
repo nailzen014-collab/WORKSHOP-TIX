@@ -30,6 +30,7 @@ class WorkshopRequest extends FormRequest
             'ends_at' => ['nullable', 'date', 'after:starts_at'],
             'location' => ['required', 'string', 'max:255'],
             'status' => ['required', Rule::in(['draft', 'published'])],
+            'image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
         ];
     }
 

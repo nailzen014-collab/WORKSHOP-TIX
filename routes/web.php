@@ -12,11 +12,22 @@ use App\Http\Controllers\RegistrationController;
 use App\Http\Controllers\TicketController;
 use App\Http\Controllers\WorkshopController;
 use Illuminate\Support\Facades\Route;
-use Kreait\Firebase\Contract\Firestore;
-
 
 Route::get('/', [WorkshopController::class, 'index'])->name('home');
 Route::get('/workshops/{workshop:slug}', [WorkshopController::class, 'show'])->name('workshops.show');
+Route::post('/workshops/{workshop:slug}/register/guest', [RegistrationController::class, 'storeGuest'])
+    ->middleware('throttle:10,1')
+    ->name('registrations.guest.store');
+
+Route::get('/guest/registrations/{registration}/payment', [PaymentController::class, 'showGuest'])
+    ->middleware('signed:order_id,status_code,transaction_status')
+    ->name('guest.payments.show');
+Route::post('/guest/registrations/{registration}/payment', [PaymentController::class, 'payGuest'])
+    ->middleware(['signed', 'throttle:10,1'])
+    ->name('guest.payments.pay');
+Route::post('/guest/registrations/{registration}/payment/check', [PaymentController::class, 'checkGuest'])
+    ->middleware(['signed', 'throttle:10,1'])
+    ->name('guest.payments.check');
 
 Route::middleware('auth')->group(function () {
     Route::get('/dashboard', fn () => redirect()->route('home'))->name('dashboard');
@@ -52,7 +63,5 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
         ->parameters(['payment-types' => 'paymentType']);
     Route::resource('statuses', StatusController::class)->except('show');
 });
-
-
 
 require __DIR__.'/auth.php';

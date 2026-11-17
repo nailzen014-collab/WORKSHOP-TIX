@@ -29,9 +29,12 @@ class ParticipantController extends Controller
             ->when($request->filled('q'), function ($query) use ($request) {
                 $term = '%'.$request->string('q')->toString().'%';
 
-                $query->whereHas('user', fn ($query) => $query
-                    ->where('name', 'like', $term)
-                    ->orWhere('email', 'like', $term));
+                $query->where(function ($query) use ($term) {
+                    $query->whereHas('user', fn ($query) => $query
+                        ->where('name', 'like', $term)
+                        ->orWhere('email', 'like', $term))
+                        ->orWhere('guest_name', 'like', $term);
+                });
             })
             ->when($request->filled('category'), function ($query) use ($request) {
                 $query->whereHas('workshop.category', fn ($query) => $query->where('slug', $request->string('category')->toString()));

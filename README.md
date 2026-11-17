@@ -8,6 +8,8 @@ Dokumen kebutuhan lengkap ada di [`PRD.md`](PRD.md).
 
 - Registrasi, login, logout (Laravel Breeze).
 - Daftar & detail workshop (hanya workshop berstatus `published`).
+- Gambar workshop di kartu dan halaman detail; jadwal dan deskripsi lengkap tersedia di detail.
+- Pendaftaran dengan akun atau sebagai guest. Guest mendapat tautan privat selama 7 hari untuk membuka tiket setelah pembayaran lunas.
 - Pendaftaran peserta + pencegahan pendaftaran ganda (unique `user_id` + `workshop_id`).
 - Transaksi pembayaran dibuat otomatis dengan status awal `pending`, nominal **selalu dari database**.
 - Integrasi Midtrans Snap (Sandbox): buat transaksi, cek status server-side, dan webhook notifikasi dengan verifikasi signature `SHA512`.
@@ -36,10 +38,15 @@ Atur koneksi database di `.env` (MySQL `workshop_tix`), lalu:
 
 ```bash
 php artisan migrate --seed
+php artisan storage:link
 npm run build
 ```
 
 `--seed` membuat dua akun demo dan enam workshop contoh.
+
+## Gambar workshop
+
+Admin dapat mengunggah atau mengganti gambar workshop JPG, PNG, atau WebP (maksimal 5 MB) dari form workshop. File disimpan di disk lokal pada `storage/app/public/workshops`; jalankan `php artisan storage:link` agar gambar dapat ditampilkan melalui web.
 
 ### Akun demo
 
@@ -86,7 +93,7 @@ composer run dev
 php artisan test
 ```
 
-Suite mencakup autentikasi, akses berbasis peran, pendaftaran (termasuk anti-duplikasi), verifikasi nominal server-side, isolasi akses tiket, dan webhook pembayaran (signature & re-issue tiket).
+Suite mencakup autentikasi, akses berbasis peran, pendaftaran (termasuk anti-duplikasi dan guest checkout), gambar workshop, verifikasi nominal server-side, isolasi akses tiket, dan webhook pembayaran (signature & re-issue tiket).
 
 ## Struktur Singkat
 

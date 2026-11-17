@@ -2,7 +2,9 @@
 
 namespace App\Providers;
 
+use App\Services\LocalWorkshopImageStorage;
 use App\Services\StatusPresenter;
+use App\Services\WorkshopImageStorage;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\ServiceProvider;
 
@@ -14,6 +16,7 @@ class AppServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->singleton(StatusPresenter::class);
+        $this->app->bind(WorkshopImageStorage::class, LocalWorkshopImageStorage::class);
     }
 
     /**
