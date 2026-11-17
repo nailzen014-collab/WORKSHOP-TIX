@@ -72,7 +72,7 @@ test('an unknown midtrans payment type creates a master record and still issues 
 
     expect($paymentType)->not->toBeNull();
     expect($payment->payment_type_id)->toBe($paymentType->id);
-    expect($payment->registration->ticket)->not->toBeNull();
+    expect($payment->registration->tickets)->toHaveCount(1);
 });
 
 test('repeated notifications do not duplicate payment types', function () {

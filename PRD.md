@@ -47,6 +47,7 @@ Beberapa permasalahan yang ingin diselesaikan melalui WorkshopTIX:
 5. Panitia membutuhkan informasi status pembayaran peserta.
 6. Peserta membutuhkan tiket digital sebagai bukti pendaftaran.
 7. Panitia membutuhkan dashboard untuk mengelola workshop dan melihat data peserta.
+8. Peserta dapat memesan maksimal lima tiket workshop dan mengisi nama setiap peserta.
 
 # 3. Tujuan Produk
 
@@ -107,7 +108,8 @@ Hak akses:
 12. Pembuatan tiket digital.
 13. Validasi form.
 14. Pencegahan pendaftaran ganda.
-15. Optimasi query database dan pemeriksaan N+1.
+15. Pemesanan maksimal lima tiket per workshop dengan identitas nama untuk setiap tiket.
+16. Optimasi query database dan pemeriksaan N+1.
 
 ## 5.2 Di Luar Ruang Lingkup
 
@@ -126,13 +128,12 @@ Hak akses:
 3. Peserta memilih workshop.
 4. Peserta membuka detail workshop.
 5. Peserta melakukan register atau login.
-6. Peserta mengisi formulir pendaftaran.
-7. Sistem menyimpan data pendaftaran.
-8. Sistem membuat transaksi dengan status pending.
-9. Peserta melakukan pembayaran melalui payment gateway.
-10. Backend menerima dan memverifikasi status pembayaran.
-11. Jika pembayaran berhasil, sistem menerbitkan tiket digital.
-12. Peserta dapat melihat tiket melalui halaman tiket saya.
+6. Peserta mengisi nama setiap pemegang tiket, maksimal lima orang.
+7. Sistem menyimpan data pendaftaran dan membuat transaksi sesuai jumlah tiket.
+8. Peserta melakukan pembayaran melalui payment gateway.
+9. Backend menerima dan memverifikasi status pembayaran.
+10. Jika pembayaran berhasil, sistem menerbitkan satu tiket digital untuk setiap nama peserta.
+11. Peserta dapat melihat seluruh tiket melalui halaman tiket saya.
 
 ## 6.2 Alur Panitia
 
@@ -187,6 +188,9 @@ Hak akses:
 | BR-06 | Hanya admin yang dapat mengelola workshop. |
 | BR-07 | Peserta tidak boleh mendaftar dua kali pada workshop yang sama. |
 | BR-08 | Transaksi yang belum lunas tidak boleh menghasilkan tiket aktif. |
+| BR-09 | Satu akun atau pesanan guest maksimal membeli lima tiket untuk satu workshop. |
+| BR-10 | Setiap tiket harus memiliki nama peserta masing-masing. |
+| BR-11 | Nominal transaksi adalah harga workshop dikalikan jumlah tiket. |
 
 # 9. Integrasi Payment Gateway
 
@@ -271,6 +275,8 @@ Sistem dianggap berhasil apabila:
 - [ ] Peserta dapat register dan login.
 - [ ] Peserta dapat melakukan pendaftaran.
 - [ ] Sistem mencegah pendaftaran ganda.
+- [ ] Satu pendaftaran dapat berisi maksimal lima tiket dan setiap tiket memiliki nama peserta.
+- [ ] Total pembayaran sesuai jumlah tiket yang dipesan.
 - [ ] Admin dapat melakukan CRUD workshop.
 - [ ] Admin dapat melihat daftar peserta.
 - [ ] Status transaksi awal adalah pending.

@@ -95,7 +95,7 @@ test('guests can create a private payment page without creating an account', fun
     $workshop = Workshop::factory()->create(['price' => 75000]);
 
     $response = $this->post(route('registrations.guest.store', $workshop), [
-        'guest_name' => 'Nabhan Guest',
+        'attendees' => ['Nabhan Guest', 'Alya Guest'],
     ]);
 
     $response->assertRedirect();
@@ -105,7 +105,8 @@ test('guests can create a private payment page without creating an account', fun
         ->where('guest_name', 'Nabhan Guest')
         ->firstOrFail();
 
-    expect($registration->payment->amount)->toBe(75000);
+    expect($registration->attendees)->toBe(['Nabhan Guest', 'Alya Guest']);
+    expect($registration->payment->amount)->toBe(150000);
     expect($registration->payment->payment_status)->toBe(Payment::STATUS_PENDING);
 
     $this->get(route('guest.payments.show', $registration))
@@ -117,14 +118,28 @@ test('guests can create a private payment page without creating an account', fun
         ->assertSee('Tautan halaman ini bersifat privat');
 });
 
+test('a guest cannot order more than five tickets for one workshop', function () {
+    $workshop = Workshop::factory()->create();
+
+    $this->from(route('workshops.show', $workshop))
+        ->post(route('registrations.guest.store', $workshop), [
+            'attendees' => ['A', 'B', 'C', 'D', 'E', 'F'],
+        ])
+        ->assertRedirect(route('workshops.show', $workshop))
+        ->assertSessionHasErrors('attendees');
+
+    expect(Registration::query()->whereNull('user_id')->exists())->toBeFalse();
+});
+
 test('a guest sees the ticket on their signed page after payment is confirmed', function () {
     config(['services.midtrans.server_key' => 'test-server-key']);
 
-    $workshop = Workshop::factory()->create();
+    $workshop = Workshop::factory()->create(['price' => 50000]);
     $registration = Registration::create([
         'user_id' => null,
         'workshop_id' => $workshop->id,
         'guest_name' => 'Nabhan Guest',
+        'attendees' => ['Nabhan Guest', 'Alya Guest'],
         'status' => 'pending',
     ]);
     $payment = $registration->payment()->create([
@@ -152,7 +167,9 @@ test('a guest sees the ticket on their signed page after payment is confirmed', 
 
     $this->get($guestUrl)
         ->assertOk()
-        ->assertSee($registration->ticket->ticket_code)
+        ->assertSee($registration->tickets->first()->ticket_code)
+        ->assertSee('Nabhan Guest')
+        ->assertSee('Alya Guest')
         ->assertSee('screenshot tiket');
 
     $callbackUrl = $guestUrl.'&order_id='.$payment->order_id.'&status_code=200&transaction_status=settlement';

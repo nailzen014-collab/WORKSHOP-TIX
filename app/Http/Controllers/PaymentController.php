@@ -25,7 +25,7 @@ class PaymentController extends Controller
     {
         Gate::authorize('view', $registration);
 
-        $registration->load('payment', 'workshop', 'ticket');
+        $registration->load('payment', 'workshop', 'tickets');
 
         return view('payments.show', [
             'registration' => $registration,
@@ -50,7 +50,7 @@ class PaymentController extends Controller
     {
         abort_unless($registration->user_id === null, 404);
 
-        $registration->load('payment', 'workshop', 'ticket');
+        $registration->load('payment', 'workshop', 'tickets');
 
         return view('payments.guest', [
             'registration' => $registration,
@@ -187,13 +187,21 @@ class PaymentController extends Controller
             ]);
 
             if ($isPaid) {
-                $registration = $payment->registration;
+                $registration = Registration::query()
+                    ->lockForUpdate()
+                    ->findOrFail($payment->registration_id);
+                $attendees = $registration->attendees
+                    ?? [$registration->guest_name ?? $registration->user?->name ?? 'Peserta'];
+                $existingTickets = $registration->tickets()->count();
 
-                $registration->ticket()->firstOrCreate([], [
-                    'ticket_code' => 'TIX-'.strtoupper(Str::ulid()),
-                    'status' => 'active',
-                    'issued_at' => now(),
-                ]);
+                foreach (array_slice($attendees, $existingTickets) as $attendeeName) {
+                    $registration->tickets()->create([
+                        'attendee_name' => $attendeeName,
+                        'ticket_code' => 'TIX-'.strtoupper(Str::ulid()),
+                        'status' => 'active',
+                        'issued_at' => now(),
+                    ]);
+                }
 
                 $registration->update(['status' => 'paid']);
             }

@@ -115,7 +115,7 @@
                                         <span class="badge-chip">{{ $workshop->location }}</span>
                                     </div>
                                     <div class="ml-auto text-right">
-                                        <p class="text-xs font-semibold text-forest-500">{{ $workshop->registrations_count }} peserta</p>
+                                        <p class="text-xs font-semibold text-forest-500">{{ $workshop->registrations_count }} pesanan</p>
                                         <p class="eyebrow">Harga</p>
                                         <p class="mt-0.5 font-display text-lg font-extrabold text-forest-900">Rp{{ number_format($workshop->price, 0, ',', '.') }}</p>
                                     </div>

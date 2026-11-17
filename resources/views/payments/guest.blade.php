@@ -28,13 +28,18 @@
                         $paid = $registration->payment->isPaid();
                     @endphp
 
-                    @if ($paid && $registration->ticket)
+                    @if ($paid && $registration->tickets->isNotEmpty())
                         <div class="mt-7 border-t border-forest-900/10 pt-6">
-                            <p class="eyebrow text-forest-600">Tiket Anda</p>
-                            <div class="mt-3 rounded-2xl bg-forest-900 p-6 text-center text-cream-50">
-                                <p class="text-xs uppercase tracking-widest text-cream-100/60">Kode Tiket</p>
-                                <p class="mt-2 break-all font-mono text-2xl font-bold tracking-widest text-lime-500">{{ $registration->ticket->ticket_code }}</p>
-                            </div>
+                            <p class="eyebrow text-forest-600">Tiket Peserta</p>
+                            <ul class="mt-3 space-y-3">
+                                @foreach ($registration->tickets as $ticket)
+                                    <li class="rounded-2xl bg-forest-900 p-6 text-center text-cream-50">
+                                        <p class="text-sm font-semibold">{{ $ticket->attendee_name ?? 'Peserta' }}</p>
+                                        <p class="mt-2 text-xs uppercase tracking-widest text-cream-100/60">Kode Tiket {{ $loop->iteration }}</p>
+                                        <p class="mt-2 break-all font-mono text-2xl font-bold tracking-widest text-lime-500">{{ $ticket->ticket_code }}</p>
+                                    </li>
+                                @endforeach
+                            </ul>
 
                             <dl class="mt-5 grid gap-4 text-sm sm:grid-cols-2">
                                 <div>
@@ -66,6 +71,14 @@
                                 <dd class="mt-1 font-display text-xl font-extrabold text-forest-900">Rp{{ number_format($registration->payment->amount, 0, ',', '.') }}</dd>
                             </div>
                         </dl>
+                        <div class="mt-5">
+                            <p class="eyebrow">Peserta per tiket</p>
+                            <ul class="mt-2 list-inside list-disc space-y-1 text-sm text-forest-700">
+                                @foreach ($registration->attendees ?? [$registration->guest_name ?? 'Peserta'] as $attendee)
+                                    <li>{{ $attendee }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
 
                         <div class="mt-5 flex items-center gap-2">
                             <span class="text-sm font-semibold text-forest-700">Status pembayaran:</span>

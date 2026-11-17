@@ -6,12 +6,23 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
-#[Fillable(['user_id', 'workshop_id', 'guest_name', 'status'])]
+#[Fillable(['user_id', 'workshop_id', 'guest_name', 'attendees', 'status'])]
 class Registration extends Model
 {
     use HasFactory;
+
+    /**
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'attendees' => 'array',
+        ];
+    }
 
     /**
      * @return BelongsTo<User, $this>
@@ -38,10 +49,10 @@ class Registration extends Model
     }
 
     /**
-     * @return HasOne<Ticket, $this>
+     * @return HasMany<Ticket, $this>
      */
-    public function ticket(): HasOne
+    public function tickets(): HasMany
     {
-        return $this->hasOne(Ticket::class);
+        return $this->hasMany(Ticket::class);
     }
 }

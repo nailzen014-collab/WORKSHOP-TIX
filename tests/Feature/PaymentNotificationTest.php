@@ -53,7 +53,7 @@ test('a valid settlement notification issues a ticket', function () {
 
     expect($payment->isPaid())->toBeTrue();
     expect($payment->paid_at)->not->toBeNull();
-    expect($payment->registration->ticket)->not->toBeNull();
+    expect($payment->registration->tickets)->toHaveCount(1);
 });
 
 test('a pending notification does not issue a ticket', function () {
@@ -62,7 +62,7 @@ test('a pending notification does not issue a ticket', function () {
     $this->postJson(route('midtrans.notification'), midtransPayload($payment, 'pending'))
         ->assertOk();
 
-    expect($payment->refresh()->registration->ticket)->toBeNull();
+    expect($payment->refresh()->registration->tickets)->toBeEmpty();
 });
 
 test('a notification with an invalid signature is rejected', function () {
@@ -94,5 +94,22 @@ test('repeated settlement notifications do not create duplicate tickets', functi
     $this->postJson(route('midtrans.notification'), $payload)->assertOk();
     $this->postJson(route('midtrans.notification'), $payload)->assertOk();
 
-    expect($payment->registration->ticket()->count())->toBe(1);
+    expect($payment->registration->tickets()->count())->toBe(1);
+});
+
+test('a paid order issues one named ticket for each attendee', function () {
+    $payment = makePendingPayment();
+    $payment->registration->update(['attendees' => ['Nabhan', 'Alya', 'Bima']]);
+    $payment->update(['amount' => 300000]);
+    $payload = midtransPayload($payment, 'settlement', ['gross_amount' => '300000.00']);
+    $payload['signature_key'] = hash(
+        'sha512',
+        $payment->order_id.$payload['status_code'].'300000.00'.config('services.midtrans.server_key'),
+    );
+
+    $this->postJson(route('midtrans.notification'), $payload)->assertOk();
+    $this->postJson(route('midtrans.notification'), $payload)->assertOk();
+
+    expect($payment->registration->tickets()->count())->toBe(3);
+    expect($payment->registration->tickets()->orderBy('id')->pluck('attendee_name')->all())->toBe(['Nabhan', 'Alya', 'Bima']);
 });

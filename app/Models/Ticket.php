@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-#[Fillable(['registration_id', 'ticket_code', 'status', 'issued_at'])]
+#[Fillable(['registration_id', 'attendee_name', 'ticket_code', 'status', 'issued_at'])]
 class Ticket extends Model
 {
     use HasFactory;

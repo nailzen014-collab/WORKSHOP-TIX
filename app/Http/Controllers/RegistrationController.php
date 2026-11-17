@@ -16,6 +16,11 @@ class RegistrationController extends Controller
     {
         abort_unless($workshop->status === 'published', 404);
 
+        $validated = $request->validate([
+            'attendees' => ['required', 'array', 'min:1', 'max:5'],
+            'attendees.*' => ['required', 'string', 'max:255'],
+        ]);
+        $attendees = array_values($validated['attendees']);
         $user = $request->user();
 
         $existing = $user->registrations()
@@ -28,15 +33,16 @@ class RegistrationController extends Controller
                 ->with('status', 'Anda sudah terdaftar pada workshop ini.');
         }
 
-        $registration = DB::transaction(function () use ($user, $workshop) {
+        $registration = DB::transaction(function () use ($user, $workshop, $attendees) {
             $registration = $workshop->registrations()->create([
                 'user_id' => $user->id,
+                'attendees' => $attendees,
                 'status' => 'pending',
             ]);
 
             $registration->payment()->create([
                 'order_id' => 'WTX-'.strtoupper(Str::ulid()),
-                'amount' => $workshop->price,
+                'amount' => $workshop->price * count($attendees),
                 'payment_status' => Payment::STATUS_PENDING,
             ]);
 
@@ -53,18 +59,21 @@ class RegistrationController extends Controller
         abort_unless($workshop->status === 'published', 404);
 
         $validated = $request->validate([
-            'guest_name' => ['required', 'string', 'max:255'],
+            'attendees' => ['required', 'array', 'min:1', 'max:5'],
+            'attendees.*' => ['required', 'string', 'max:255'],
         ]);
+        $attendees = array_values($validated['attendees']);
 
-        $registration = DB::transaction(function () use ($validated, $workshop) {
+        $registration = DB::transaction(function () use ($attendees, $workshop) {
             $registration = $workshop->registrations()->create([
-                'guest_name' => $validated['guest_name'],
+                'guest_name' => $attendees[0],
+                'attendees' => $attendees,
                 'status' => 'pending',
             ]);
 
             $registration->payment()->create([
                 'order_id' => 'WTX-'.strtoupper(Str::ulid()),
-                'amount' => $workshop->price,
+                'amount' => $workshop->price * count($attendees),
                 'payment_status' => Payment::STATUS_PENDING,
             ]);
 

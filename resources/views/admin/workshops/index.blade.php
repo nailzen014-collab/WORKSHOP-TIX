@@ -32,7 +32,7 @@
                                     <th class="px-6 py-3 font-semibold">Kategori</th>
                                     <th class="px-6 py-3 font-semibold">Jadwal</th>
                                     <th class="px-6 py-3 font-semibold">Harga</th>
-                                    <th class="px-6 py-3 font-semibold">Peserta</th>
+                                    <th class="px-6 py-3 font-semibold">Pesanan</th>
                                     <th class="px-6 py-3 font-semibold">Status</th>
                                     <th class="px-6 py-3 text-right font-semibold">Aksi</th>
                                 </tr>

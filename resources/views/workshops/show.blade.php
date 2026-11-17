@@ -57,16 +57,25 @@
                         @auth
                             @if (! $registration)
                                 <p class="text-sm text-forest-700">Anda belum terdaftar pada workshop ini.</p>
-                                <form method="POST" action="{{ route('registrations.store', $workshop) }}" class="mt-5">
+                                <form method="POST" action="{{ route('registrations.store', $workshop) }}" class="mt-5 space-y-4" data-attendee-form>
                                     @csrf
+                                    @include('workshops.attendee-fields')
                                     <button type="submit" class="pill-button-lime w-full justify-center">
                                         Daftar Workshop
                                         <svg class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path d="M6 4l6 6-6 6V4z" /></svg>
                                     </button>
                                 </form>
-                            @elseif ($registration->ticket)
-                                <p class="text-sm font-semibold text-forest-700">Pembayaran lunas. Tiket Anda sudah terbit.</p>
-                                <a href="{{ route('tickets.show', $registration->ticket) }}" class="pill-button mt-5 w-full justify-center">Lihat Tiket</a>
+                            @elseif ($registration->tickets->isNotEmpty())
+                                <p class="text-sm font-semibold text-forest-700">Pembayaran lunas. Tiket peserta sudah terbit.</p>
+                                <ul class="mt-5 space-y-2">
+                                    @foreach ($registration->tickets as $ticket)
+                                        <li>
+                                            <a href="{{ route('tickets.show', $ticket) }}" class="pill-button w-full justify-center">
+                                                Tiket {{ $loop->iteration }} &mdash; {{ $ticket->attendee_name ?? 'Peserta' }}
+                                            </a>
+                                        </li>
+                                    @endforeach
+                                </ul>
                             @else
                                 <p class="text-sm text-forest-700">Anda sudah terdaftar. Status pembayaran: <strong>{{ ucfirst($registration->payment?->payment_status ?? 'pending') }}</strong>.</p>
                                 <a href="{{ route('payments.show', $registration) }}" class="pill-button mt-5 w-full justify-center">Lanjutkan Pembayaran</a>
@@ -78,13 +87,11 @@
                                 <a href="{{ route('register') }}" class="pill-button-outline w-full justify-center">Buat Akun</a>
                             </div>
 
-                            <form method="POST" action="{{ route('registrations.guest.store', $workshop) }}" class="mt-6 border-t border-forest-900/10 pt-5">
+                            <form method="POST" action="{{ route('registrations.guest.store', $workshop) }}" class="mt-6 space-y-4 border-t border-forest-900/10 pt-5" data-attendee-form>
                                 @csrf
-                                <label for="guest_name" class="text-xs font-semibold uppercase tracking-wide text-forest-600">Nama pada tiket</label>
-                                <input id="guest_name" name="guest_name" type="text" value="{{ old('guest_name') }}" autocomplete="name" maxlength="255" required class="mt-1 block w-full rounded-xl border-forest-900/20 bg-cream-50 text-sm text-forest-900 shadow-sm focus:border-forest-600 focus:ring-forest-600">
-                                @error('guest_name') <p class="mt-1 text-sm text-red-600">{{ $message }}</p> @enderror
-                                <p class="mt-2 text-xs leading-relaxed text-forest-600">Setelah pembayaran, tiket tampil lewat tautan privat ini. Simpan tautannya atau screenshot tiketnya.</p>
-                                <button type="submit" class="pill-button mt-4 w-full justify-center">Lanjut Tanpa Akun</button>
+                                @include('workshops.attendee-fields')
+                                <p class="text-xs leading-relaxed text-forest-600">Setelah pembayaran, tiket tampil lewat tautan privat ini. Simpan tautannya atau screenshot tiketnya.</p>
+                                <button type="submit" class="pill-button w-full justify-center">Lanjut Tanpa Akun</button>
                             </form>
                         @endauth
                     </div>

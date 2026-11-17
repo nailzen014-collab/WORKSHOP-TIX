@@ -14,6 +14,10 @@
 
                 <dl class="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
                     <div class="rounded-2xl bg-cream-200/60 p-4">
+                        <dt class="eyebrow">Jumlah Tiket</dt>
+                        <dd class="mt-1 text-sm font-semibold text-forest-900">{{ count($registration->attendees ?? [$registration->user?->name ?? 'Peserta']) }} tiket</dd>
+                    </div>
+                    <div class="rounded-2xl bg-cream-200/60 p-4">
                         <dt class="eyebrow">Kode Pesanan</dt>
                         <dd class="mt-1 font-mono text-sm text-forest-900">{{ $registration->payment->order_id }}</dd>
                     </div>
@@ -22,6 +26,15 @@
                         <dd class="mt-1 font-display text-2xl font-extrabold text-forest-900">Rp{{ number_format($registration->payment->amount, 0, ',', '.') }}</dd>
                     </div>
                 </dl>
+
+                <div class="mt-5">
+                    <p class="eyebrow">Peserta per tiket</p>
+                    <ul class="mt-2 list-inside list-disc space-y-1 text-sm text-forest-700">
+                        @foreach ($registration->attendees ?? [$registration->user?->name ?? 'Peserta'] as $attendee)
+                            <li>{{ $attendee }}</li>
+                        @endforeach
+                    </ul>
+                </div>
 
                 @php
                     $paid = $registration->payment->isPaid();
@@ -36,8 +49,10 @@
 
                 <div class="mt-8 flex flex-wrap gap-3 border-t border-forest-900/10 pt-6">
                     @if ($paid)
-                        @if ($registration->ticket)
-                            <a href="{{ route('tickets.show', $registration->ticket) }}" class="pill-button">Lihat Tiket Saya</a>
+                        @if ($registration->tickets->isNotEmpty())
+                            @foreach ($registration->tickets as $ticket)
+                                <a href="{{ route('tickets.show', $ticket) }}" class="pill-button">Tiket {{ $loop->iteration }}: {{ $ticket->attendee_name ?? 'Peserta' }}</a>
+                            @endforeach
                         @endif
                     @else
                         <form method="POST" action="{{ route('payments.pay', $registration) }}">

@@ -30,8 +30,14 @@
                             </div>
 
                             <div class="mt-4">
-                                @if ($paid && $registration->ticket)
-                                    <a href="{{ route('tickets.show', $registration->ticket) }}" class="pill-button">Lihat Tiket</a>
+                                @if ($paid && $registration->tickets->isNotEmpty())
+                                    <div class="flex flex-wrap gap-2">
+                                        @foreach ($registration->tickets as $ticket)
+                                            <a href="{{ route('tickets.show', $ticket) }}" class="pill-button">
+                                                Tiket {{ $loop->iteration }}: {{ $ticket->attendee_name ?? 'Peserta' }}
+                                            </a>
+                                        @endforeach
+                                    </div>
                                 @else
                                     <a href="{{ route('payments.show', $registration) }}" class="pill-button-outline">Lanjutkan Pembayaran</a>
                                 @endif

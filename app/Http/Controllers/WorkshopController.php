@@ -53,7 +53,7 @@ class WorkshopController extends Controller
         if ($user = request()->user()) {
             $registration = $user->registrations()
                 ->whereBelongsTo($workshop)
-                ->with(['payment', 'ticket'])
+                ->with(['payment', 'tickets'])
                 ->first();
         }
 

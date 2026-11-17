@@ -12,7 +12,7 @@ class TicketController extends Controller
     {
         $registrations = $request->user()
             ->registrations()
-            ->with(['workshop', 'payment', 'ticket'])
+            ->with(['workshop', 'payment', 'tickets'])
             ->latest()
             ->get();
 

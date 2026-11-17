@@ -42,12 +42,17 @@
                                         <td class="px-6 py-4">
                                             <div class="font-semibold text-forest-900">{{ $registration->user?->name ?? $registration->guest_name ?? 'Peserta guest' }}</div>
                                             <div class="text-xs text-forest-500">{{ $registration->user?->email ?? 'Tanpa akun' }}</div>
+                                            <ul class="mt-2 space-y-1 text-xs text-forest-700">
+                                                @foreach ($registration->attendees ?? [$registration->guest_name ?? $registration->user?->name ?? 'Peserta guest'] as $attendee)
+                                                    <li>{{ $loop->iteration }}. {{ $attendee }}</li>
+                                                @endforeach
+                                            </ul>
                                         </td>
                                         <td class="px-6 py-4">
                                             <div class="font-semibold text-forest-800">{{ $registration->workshop->title }}</div>
                                             <div class="text-xs text-forest-500">{{ $registration->workshop->category?->name ?? 'Tanpa kategori' }}</div>
                                         </td>
-                                        <td class="px-6 py-4 font-semibold text-forest-800">Rp{{ number_format($registration->workshop->price, 0, ',', '.') }}</td>
+                                        <td class="px-6 py-4 font-semibold text-forest-800">Rp{{ number_format($payment?->amount ?? 0, 0, ',', '.') }}</td>
                                         <td class="px-6 py-4 text-forest-700">{{ $payment?->paymentTypeLabel() ?? '—' }}</td>
                                         <td class="px-6 py-4">
                                             <x-status-badge entity="payment" :code="$payment?->payment_status" fallback="Menunggu" />
